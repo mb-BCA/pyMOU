@@ -12,7 +12,7 @@
 Multivariate Ornstein-Uhlenbeck process
 =======================================
 
-A package to simulate the Multivariate Ornstein-Uhlenbeck (MOU) process and 
+A package to simulate the Multivariate Ornstein-Uhlenbeck (MOU) process and
 fit it to time series (i.e. optimize its parameters like connectivity).
 
 An application is the estimation of whole-brain effective connectivity for fMRI
@@ -28,23 +28,23 @@ tools
 References:
 - Gilson M, Moreno-Bote R, Ponce-Alvarez A, Ritter P, Deco G (2016) "Estimation
 of directed Effective Connectivity from fMRI Functional Connectivity Hints at
-Asymmetries of Cortical Connectome" PLoS Comput Biol 12: e1004762, 
+Asymmetries of Cortical Connectome" PLoS Comput Biol 12: e1004762,
 https://doi.org/10.1371/journal.pcbi.1004762.
-- Gilson M, Deco G, Friston K, Hagmann P, Mantini D, Betti V, Romani GL, 
-Corbetta M (2018) "Effective connectivity inferred from fMRI transition 
+- Gilson M, Deco G, Friston K, Hagmann P, Mantini D, Betti V, Romani GL,
+Corbetta M (2018) "Effective connectivity inferred from fMRI transition
 dynamics during movie viewing points to a balanced reconfiguration of cortical
-interactions" Neuroimage 180: 534-546, 
+interactions" Neuroimage 180: 534-546,
 https://doi.org/10.1016/j.neuroimage.2017.09.061;
-- Gilson M, Zamora-López G, Pallarés V, Adhikari MH, Senden M, Tauste Campo A, 
-Mantini D, Corbetta M, Deco G, Insabato A (biorxiv) "MOU-EC: model-based 
-whole-brain effective connectivity to extract biomarkers for brain dynamics 
+- Gilson M, Zamora-López G, Pallarés V, Adhikari MH, Senden M, Tauste Campo A,
+Mantini D, Corbetta M, Deco G, Insabato A (biorxiv) "MOU-EC: model-based
+whole-brain effective connectivity to extract biomarkers for brain dynamics
 from fMRI data and study distributed cognition", http://doi.org/10.1101/531830;
 
 
 Using pyMOU
 -----------
 
-The notebook 'MOU_Simulation_Estimation.ipynb' in the directory 'examples/' 
+The notebook 'MOU_Simulation_Estimation.ipynb' in the directory 'examples/'
 illustrates how to use the MOU class for simulation of the MOU process and
 estimation of the connectivity from observed activity.
 
@@ -79,5 +79,5 @@ __author__ = "Andrea Insabato, Gorka Zamora-Lopez and Matthieu Gilson"
 __email__ = "galib@Zamora-Lopez.xyz"
 __copyright__ = "Copyright 2019"
 __license__ = "Apache License version 2.0"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __update__="01/11/2019"

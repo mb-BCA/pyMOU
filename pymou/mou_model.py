@@ -8,7 +8,7 @@ you may not use this software except in compliance with the License.
 You may obtain a copy of the License at
     http://www.apache.org/licenses/LICENSE-2.0
 
-Main class to deal with construction, simulation and estimation for the 
+Main class to deal with construction, simulation and estimation for the
 multivariate Ornstein-Uhlenbeck (MOU) process.
 """
 
@@ -30,23 +30,23 @@ class MOU(BaseEstimator):
         Number of nodes in the network.
     J : ndarray of rank-2
         Jacobian matrix between the nodes. The diagonal corresponds to a vector
-        of time constants. For off-diagonal elements, the first dimension 
-        corresponds to target nodes and the second dimension to source nodes 
+        of time constants. For off-diagonal elements, the first dimension
+        corresponds to target nodes and the second dimension to source nodes
         (J_ij is from i to j).
     mu : ndarray of rank-1
         Mean vector of the inputs to the nodes.
     Sigma : ndarray of rank-2
-        Covariance matrix of the inputs to the nodes (multivariate Wiener 
+        Covariance matrix of the inputs to the nodes (multivariate Wiener
         process).
 
     Methods
     -------
     calc_Q0_from_param : Calculates the zero-lag covariance matrix from a Jacobian J and an
         input covariance matrix Sigma
-        
+
     calc_Qlag_from_param : Calculates the zero-lag covariance matrix from a Jacobian J and an
         input covariance matrix Sigma
-        
+
     fit : Fit the model to a time series (time x nodes). If existing, the
         previous parameters (connectivity, etc.) are erased and replaced.
 
@@ -55,9 +55,9 @@ class MOU(BaseEstimator):
     fit_moments : Fit method with maximum likelihood.
 
     score : Returns the goodness of fit after the optimization.
-    
+
     simulate : Simulate the activity of the MOU process determined by J, mu and
-        Sigma.    
+        Sigma.
     """
 
     def __init__(self, C=None, tau=1.0, mu=0.0, Sigma=None,
@@ -76,12 +76,12 @@ class MOU(BaseEstimator):
             C_tmp = np.zeros([self.n, self.n], dtype=float)
         elif type(C) == np.ndarray:
             if (not C.ndim == 2) or (not C.shape[0] == C.shape[1]):
-                raise TypeError("""Argument C in MOU constructor must be square 
+                raise TypeError("""Argument C in MOU constructor must be square
                     matrix (2D).""")
             self.n = C.shape[0]
             C_tmp = C
         else:
-            raise TypeError("""Only matrix accepted for argument C in MOU 
+            raise TypeError("""Only matrix accepted for argument C in MOU
                 constructor.""")
 
         if np.isscalar(tau):
@@ -101,7 +101,7 @@ class MOU(BaseEstimator):
 
         self.J = -np.eye(self.n) / tau_tmp + C_tmp
         if np.any(np.linalg.eigvals(self.J)>0):
-            print("""The constructed MOU process has a Jacobian with negative 
+            print("""The constructed MOU process has a Jacobian with negative
                   eigenvalues, corresponding to unstable dynamics.""")
 
         # Inputs
@@ -109,11 +109,11 @@ class MOU(BaseEstimator):
             self.mu = mu
         elif type(mu) == np.ndarray:
             if (not mu.ndim == 1) or (not mu.shape[0] == self.n):
-                raise TypeError("""Vector argument mu in MOU constructor must be 
+                raise TypeError("""Vector argument mu in MOU constructor must be
                     of same size as diagonal of C.""")
             self.mu = mu
         else:
-            raise TypeError("""Only scalar value or vector accepted for argument 
+            raise TypeError("""Only scalar value or vector accepted for argument
                 tau in MOU constructor.""")
 
         if Sigma is None:
@@ -121,7 +121,7 @@ class MOU(BaseEstimator):
             self.Sigma = np.eye(self.n, dtype=float)
         elif np.isscalar(Sigma):
             if not (Sigma>0):
-                raise TypeError("""Scalar argument Sigma in MOU constructor must 
+                raise TypeError("""Scalar argument Sigma in MOU constructor must
                     be non-negative (akin to variance).""")
             self.Sigma = np.eye(self.n, dtype=float)
         elif type(Sigma) == np.ndarray:
@@ -130,7 +130,7 @@ class MOU(BaseEstimator):
                 raise TypeError("""Matrix argument Sigma in MOU constructor must
                     be square and of same size as C.""")
             if (not np.all(Sigma == Sigma.T)) or np.any(np.linalg.eigvals(Sigma) < 0):
-                raise ValueError("""Matrix argument Sigma in MOU constructor must 
+                raise ValueError("""Matrix argument Sigma in MOU constructor must
                     be positive semidefinite (hence symmetric).""")
             self.Sigma = Sigma
         else:
@@ -146,8 +146,8 @@ class MOU(BaseEstimator):
         self.d_fit['status'] = 'not fitted'
 
 
-    # METHODS FOR CLASS MOU ###################################################    
-    
+    # METHODS FOR CLASS MOU ###################################################
+
     def calc_Q0_from_param(self, J, Sigma):
         """
         Calculates the zero-lag covariance matrix from a Jacobian J and an
@@ -195,7 +195,7 @@ class MOU(BaseEstimator):
 
     def calc_emp_Q(self, X, lag, center=True):
         """ TODO: move to utils?
-        Calculate the covariance matrix with zero lag and with lag from 
+        Calculate the covariance matrix with zero lag and with lag from
         time series X of shape (time x nodes)
         """
         T = X.shape[0]
@@ -234,11 +234,11 @@ class MOU(BaseEstimator):
         Sigma : ndarray of shape (self.n,self.n)
             Estimated input noise covariance.
         d_fit : dictionary
-            A dictionary with diagnostics of the fit. Important keys are: 
+            A dictionary with diagnostics of the fit. Important keys are:
             'iterations', 'distance' (model error), 'correlation' (goodness of
             fit as measured by Pearson correlation on vectorized matrices).
         """
-        
+
         # TODO: automatize array checks and dimensionality
         if (not type(X) == np.ndarray) or (not X.ndim == 2):
             raise TypeError("""Argument X must be matrix (time x nodes).""")
@@ -247,7 +247,7 @@ class MOU(BaseEstimator):
         # call adequate method for optimization and check for specific arguments
         if method == 'lyapunov' or 'moments':
             if (not type(lag) == int) or (lag <= 0):
-                raise ValueError('Scalar value lag must an integer >0')    
+                raise ValueError('Scalar value lag must an integer >0')
             # calculate bjective covariance matrices (empirical)
             Q0_obj, Q1_obj = self.calc_emp_Q(X, lag)
             if method == 'lyapunov':
@@ -258,9 +258,9 @@ class MOU(BaseEstimator):
             raise ValueError("""Spectral method not implemented""")
             # return self.fit_spectral(Q_emp[0,:,:], Q_emp[1,:,:])
         else:
-            raise ValueError("""Please enter a valid method: 'lyapunov', 
-                'moments' or 'spectral'.""")            
-        
+            raise ValueError("""Please enter a valid method: 'lyapunov',
+                'moments' or 'spectral'.""")
+
 
     def fit_from_cov(self, Q0_obj, Q1_obj, lag=1, method='lyapunov', **kwargs):
         """
@@ -292,22 +292,22 @@ class MOU(BaseEstimator):
         if (not type(Q0_obj) == np.ndarray) or (not Q0_obj.ndim == 2) or \
            (not type(Q1_obj) == np.ndarray) or (not Q1_obj.ndim == 2) or \
            (not Q0_obj.shape==Q1_obj.shape):
-            raise TypeError("""Argument Q0_obj and Q1_obj must be matrices 
+            raise TypeError("""Argument Q0_obj and Q1_obj must be matrices
                             of shape (nodes x nodes).""")
         self.n = Q0_obj.shape[0]
-        
+
         # call adequate method for optimization
         if method == 'lyapunov':
             return self.fit_LO(Q0_obj, Q1_obj, lag, **kwargs)
         elif method == 'moments':
             return self.fit_moments(Q0_obj, Q1_obj)
         else:
-            raise ValueError("""Please enter a valid method: 'lyapunov', 
-                'moments'.""")            
-        
+            raise ValueError("""Please enter a valid method: 'lyapunov',
+                'moments'.""")
 
-    def fit_LO(self, Q0_obj, Q1_obj, lag, tau=None, mask_Q=None, mask_C=None, 
-            mask_Sigma=None, min_C=-1e10, max_C=1e10, min_Sigma_diag=0.0, 
+
+    def fit_LO(self, Q0_obj, Q1_obj, lag, tau=None, mask_Q=None, mask_C=None,
+            mask_Sigma=None, min_C=-1e10, max_C=1e10, min_Sigma_diag=0.0,
             regul_C=0.0, regul_Sigma=0.0, eta_C=0.05, eta_tau=0.0,
             eta_Sigma=0.05, max_iter=500, min_iter=10, algo_version='2021'):
         """
@@ -343,10 +343,10 @@ class MOU(BaseEstimator):
             Regularization parameter for C. First try values in range
             (0.0-0.5).
         regul_Sigma : float; default=0.0
-            Regularization parameter for Sigma. Useful when  fitting 
+            Regularization parameter for Sigma. Useful when  fitting
         min_C : float; default=-1e10
             Minimum bound for connectivity estimate C. For instance, useful to
-            prevent negative weights (too negative can lead the system to 
+            prevent negative weights (too negative can lead the system to
             dynamic instability), especially for empirical/noisy signals.
         max_C : float; default=1e10
             Maximum bound for connectivity estimate C. Usually not necessary.
@@ -359,7 +359,7 @@ class MOU(BaseEstimator):
         eta_Sigma : float; default=0.05
             Learning rate for Sigma.
         max_iter : integer; default=500
-            Maximum for optimization iteration steps. If final number of 
+            Maximum for optimization iteration steps. If final number of
             iterations reaches this maximum, it means the algorithm has not
             converged (warning raised).
         min_iter : integer; default=10
@@ -377,7 +377,7 @@ class MOU(BaseEstimator):
         Sigma : ndarray of of shape (self.n,self.n)
             Estimated input noise covariance.
         d_fit : dictionary
-            A dictionary with diagnostics of the fit. Important keys are: 
+            A dictionary with diagnostics of the fit. Important keys are:
             'iterations', in addition to 'distance' (model error) and
             'correlation' (goodness of fit) and their history over the
             optimization (see also 'fit' method).
@@ -398,7 +398,7 @@ class MOU(BaseEstimator):
                 return np.dot( np.linalg.pinv(Q0), Delta_Q0 + np.dot( Delta_Q1, spl.expm(-J) ) )
         else:
             raise ValueError("""Unknown 'algo_version' for LO optimization""")
-        
+
         # Autocovariance time constant (exponential decay)
         assert Q0_obj.shape==Q1_obj.shape, """Objective covariance matrices
             should have same shape"""
@@ -432,7 +432,7 @@ class MOU(BaseEstimator):
         # c0 = norm_Q1_obj / ( norm_Q0_obj + norm_Q1_obj )
         # c1 = 1.0 - c0
 
-        # Initialize network as unconnected 
+        # Initialize network as unconnected
         # Connectivity C = 0
         C = np.zeros([self.n, self.n], dtype=float)
         # vector of time constants
@@ -498,7 +498,7 @@ class MOU(BaseEstimator):
 
             # Jacobian update with weighted FC updates depending on respective error
             Delta_J = update_J(Delta_Q0, Delta_Q1, Q0, Q1, J)
-    
+
             # Update effective conectivity matrix (regularization is L2)
             C[mask_C] += eta_C * Delta_J[mask_C]
             C[mask_C] -= eta_C * regul_C * C[mask_C]
@@ -512,9 +512,9 @@ class MOU(BaseEstimator):
             Sigma[mask_Sigma] += eta_Sigma * Delta_Sigma[mask_Sigma]
             Sigma[mask_Sigma] -= eta_Sigma * regul_Sigma * Sigma[mask_Sigma]
             Sigma[mask_diag] = np.maximum(Sigma[mask_diag], min_Sigma_diag)
-            
+
             # optimize tau
-            # Delta_tau = 
+            # Delta_tau =
 
             # Check if max allowed number of iterations have been reached
             if i_iter >= max_iter-1:
@@ -538,7 +538,7 @@ class MOU(BaseEstimator):
 
         return self
 
-    
+
     def fit_moments(self, Q0_obj, Q1_obj, mask_C=None):
         """
         Estimation of MOU parameters (connectivity C, noise covariance Sigma,
@@ -561,7 +561,7 @@ class MOU(BaseEstimator):
         d_fit : dictionary
             A dictionary with diagnostics of the fit. Keys are: ['iterations',
             'distance', 'correlation'].
-        """        
+        """
         # Jacobian estimate
         inv_Q0 = np.linalg.inv(Q0_obj)
         J = spl.logm( np.dot(inv_Q0, Q1_obj) )
@@ -573,7 +573,7 @@ class MOU(BaseEstimator):
         if mask_C is None:
             # Allow all possible connections to be tuned except self-connections (on diagonal)
             mask_C = np.logical_not(mask_diag)
-            
+
         # cast to real matrices
         if np.any(np.iscomplex(J)):
             print("Warning: complex values in J; casting to real!")
@@ -605,12 +605,12 @@ class MOU(BaseEstimator):
 
         return self
 
-    
+
     def score(self):
         """
-        Returns the correlation between goodness of fit of the MOU to the 
-        data, measured by the Pearson correlation between the obseved 
-        covariances and the model covariances. 
+        Returns the correlation between goodness of fit of the MOU to the
+        data, measured by the Pearson correlation between the obseved
+        covariances and the model covariances.
         """
         try:
             return self.d_fit['correlation']
@@ -619,7 +619,7 @@ class MOU(BaseEstimator):
             return np.nan
             ## GORKA: Shall this raise a RunTimeWarning or other type of warning?
 
-            
+
     def model_covariance(self, tau=0.0):
         """
         Calculates theoretical (lagged) covariances of the model given the
@@ -646,7 +646,7 @@ class MOU(BaseEstimator):
         else:
             return np.dot(spl.expm(-tau * self.J.T), Q0)
 
-        
+
     def simulate(self, T=100, dt=0.05, sampling_step=1., random_state=None):
         """
         Simulate the MOU process with simple Euler integration defined by the
@@ -672,7 +672,7 @@ class MOU(BaseEstimator):
         -----
         It is possible to include an acitvation function to
         give non linear effect of network input; here assumed to be identity
-        
+
         TODO: change the integration step to be more accurate, with np.exp
         """
         # 0) SECURITY CHECKS

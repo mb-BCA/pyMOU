@@ -9,7 +9,7 @@ setup(
     name = 'pymou',
     description = 'A library for simulation and connectivity estimation of multivariate Ornstein-Uhlenbeck (MOU) process in Python / NumPy.',
     url = 'https://github.com/mb-BCA/pyMOU',
-    version = '0.1.0',
+    version = '0.2.0',
     license = 'Apache License 2.0',
 
     author = 'Andrea Insabato, Gorka Zamora-López, Matthieu Gilson',
