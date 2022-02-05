@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Copyright 2019 Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
+Copyright (C) 2019-2022 Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
 
 Released under the Apache License, Version 2.0 (the "License");
 you may not use this software except in compliance with the License.

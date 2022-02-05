@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2019, Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
+# Copyright (C) 2019-2022 Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
 #
 # Released under the Apache License, Version 2.0 (the "License");
 # you may not use this software except in compliance with the License.
@@ -67,7 +67,7 @@ License
 -------
 
 See LICENSE.txt file.
-Copyright (C) 2019 - Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
+Copyright (C) 2019-2022 Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
 
 """
 from __future__ import absolute_import
@@ -77,7 +77,7 @@ from .mou_model import *
 
 __author__ = "Andrea Insabato, Gorka Zamora-Lopez and Matthieu Gilson"
 __email__ = "galib@Zamora-Lopez.xyz"
-__copyright__ = "Copyright 2019"
+__copyright__ = "Copyright 2019-2022"
 __license__ = "Apache License version 2.0"
 __version__ = "0.2.0"
 __update__="01/11/2019"
