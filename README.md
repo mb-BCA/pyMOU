@@ -1,21 +1,49 @@
+> Development and test version.
+
 # pyMOU
+
 #### Light package for simulation and connectivity estimation using the multivariate Ornstein-Uhlenbeck process (MOU)
 
 
 This Python library relies on the MOU process to simulate network activity and estimate connectivity from observed activity (Gilson et al. *PLoS Comput Biol* 2016; Gilson et al *Net Neurosci* 2020).
 
 
+## INSTALLATION
+
+### Installing from PyPI 
+
+For development purposes, pyMOU is registered in [TestPyPI](https://test.pypi.org), a separate testbench from the official *Python Package Index*, [PyPI](https://pypi.org/project/galib/) . In TestPyPI, none of the dependencies exist (python>=3.6, numpy>=1.6, scipy and scikit-learn). Therefore, before installing pyMOU please install these packages in the target python environment. Then, open a terminal window and type:
+
+    python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps pyMOU
+
+The, `--no-deps` argument will skip the attempt to install the dependencies from TestPyPI. To confirm the installation, open an interactive session (e.g., IPython or a Notebook) and try to import the library by typing `import pymou`.
+
+#### Direct installation from GitHub 
+
+If you have [git](https://git-scm.com) installed, you may like to install pyGAlib directly from its GitHub repository. Make sure the dependencies are already installed in the target environment (python>=3.6, numpy>=1.6, scipy and scikit-learn). Open a terminal window and type:
+
+	python3 -m pip install --no-deps git+https://github.com/gorkazl/pyGAlib.git@dev_v1
+
+This will only download and install the package (files in "*src/pyMOU/*") into your current environment. The tutorial Jupyter notebook in the *[examples/](https://github.com/mb-BCA/pyMOU/tree/master/examples)* folder should be downloaded manually. 
+
+#### Installing pyMOU in editable mode
+
+If you want to install pyMOU such that you can make changes to it "*on the fly*" then, visit its GitHub repository [https://github.com/gorkazl/pyGAlib/](https://github.com/gorkazl/pyGAlib/), select a branch and then click on the green "*<> Code*" button on the top right and select "Download ZIP" from the pop-up menu. Once downloaded, move the *zip* file to a target folder (e.g., "*~/Documents/myLibraries/*") and unzip the file. Open a terminal and `cd` to the resulting folder, e.g.,
+
+	cd ~/Documents/myLibraries/pyGAlib-master/
+
+Once on the path (make sure it contains the *pyproject.toml* file), type:
+
+	python3 -m pip install -e .
+
+Do not forget the "." at the end which means "*look for the pyproject.toml file in the current directory*." This will install pyGAlib such that every time changes are made to the package (located in the path chosen), these will be inmediately available. You may need to restart the IPython or Jupyter notebook session, though.
+
+
+## HOW TO USE pyMOU
+
+Check the Python notebooks in `examples`.
+
+
 ## NEW IN THIS VERSION
 
 There is no more minimum bound imposed on the estimated weights by default. If you want to estimate positive weights, use min_C=0 in the fit method! 
-
-
-## Quick install using pip 
-
-The installer pip comes with Anaconda and most Python distribution. Just run:
-
-    $ pip install git+https://github.com/mb-BCA/pyMOU.git@master
-
-## How to use?
-
-Check the Python notebooks in `examples`.
