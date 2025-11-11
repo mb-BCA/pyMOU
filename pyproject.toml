@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pymou"
+dynamic = ["version"]
+description = "Estimation of effective connectivity from brain signals considering the multivariate Ornstein-Uhlenbeck process (MOU)."
+readme = "README.md"
+license = "Apache-2.0"
+
+authors = [
+    { name = "Matthieu Gilson", email = "matthieu.gilson@univ-amu.fr" },
+    { name = "Andrea Insabato" },
+    { name = "Gorka Zamora-López", email = "gorka@zamora-lopez.xyz"},
+]
+
+maintainers = [
+    { name = "Matthieu Gilson", email = "matthieu.gilson@univ-amu.fr" },
+    { name = "Gorka Zamora-López", email = "gorka@zamora-lopez.xyz"},
+]
+
+keywords = [ "network dynamic system",
+            "Ornstein-Uhlenbeck process",
+            "connectivity estimation",
+            "effective connectivity",
+]
+
+classifiers = [
+    "Development Status :: 1 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=1.6",
+    "scikit-learn",
+    "scipy",
+]
+
+[project.urls]
+Homepage = "https://github.com/mb-BCA/pyMOU"
+
+[tool.hatch.version]
+path = "src/pymou/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/pymou",
+]
