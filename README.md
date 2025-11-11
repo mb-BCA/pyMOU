@@ -8,9 +8,9 @@
 This Python library relies on the MOU process to simulate network activity and estimate connectivity from observed activity (Gilson et al. *PLoS Comput Biol* 2016; Gilson et al *Net Neurosci* 2020).
 
 
-## INSTALLATION
+### INSTALLATION
 
-### Installing from PyPI 
+#### Installing from PyPI 
 
 For development purposes, pyMOU is registered in [TestPyPI](https://test.pypi.org), a separate testbench from the official *Python Package Index*, [PyPI](https://pypi.org/project/galib/) . In TestPyPI, none of the dependencies exist (python>=3.6, numpy>=1.6, scipy and scikit-learn). Therefore, before installing pyMOU please install these packages in the target python environment. Then, open a terminal window and type:
 
@@ -39,14 +39,14 @@ Once on the path (make sure it contains the *pyproject.toml* file), type:
 Do not forget the "." at the end which means "*look for the pyproject.toml file in the current directory*." This will install pyMOU such that every time changes are made to the package (located in the path chosen), these will be inmediately available. You may need to restart the IPython or Jupyter notebook session, though.
 
 
-## HOW TO USE pyMOU
+### HOW TO USE pyMOU
 
 Please see the Jupyter notebook tutorial in the *[examples/](https://github.com/mb-BCA/pyMOU/tree/dev_v1/examples)* folder.
 
 
-## NEW IN THIS VERSION
+### NEW IN THIS VERSION
 
-##### November XX, 2025 (Release of Version 1.0)
+#### November XX, 2025 (Release of Version 1.0)
 
 Stable version 1.0 checked, validated and released.
 
