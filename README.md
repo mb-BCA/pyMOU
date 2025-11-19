@@ -25,7 +25,7 @@ The, `--no-deps` argument will skip the attempt to install the dependencies from
 
 If you have [git](https://git-scm.com) installed, you can install pyGAlib directly from its GitHub repository. Open a terminal window and type:
 
-	python3 -m pip install git+https://github.com/mb-BCA/pyGAlib.git@master
+	python3 -m pip install git+https://github.com/mb-BCA/pyMOU.git@master
 
 This procedure will only download and install the package (files in "*src/pyMOU/*") into your current environment. The tutorial Jupyter notebook in the *[examples/](https://github.com/mb-BCA/pyMOU/tree/dev_v1/examples)* folder should be downloaded manually. 
 
