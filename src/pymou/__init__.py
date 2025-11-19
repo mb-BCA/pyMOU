@@ -12,18 +12,17 @@
 Multivariate Ornstein-Uhlenbeck process
 =======================================
 
-A package to simulate the Multivariate Ornstein-Uhlenbeck (MOU) process and
-fit it to time series (i.e. optimize its parameters like connectivity).
+A light package for the estimation of effective connectivity from brain signals
+considering the multivariate Ornstein-Uhlenbeck process (MOU) as the underlying
+generative model.
 
 An application is the estimation of whole-brain effective connectivity for fMRI
 data with parcellation of ~100 regions of interest (ROIs).
 
-The package consists of 2 Modules:
+The package consists of one module:
 
 mou_model
     Core module. Defines class MOU.
-tools
-    Diverse helper functions (e.g. to generate a random connectivity matrix).
 
 References:
 - Gilson M, Moreno-Bote R, Ponce-Alvarez A, Ritter P, Deco G (2016) "Estimation
@@ -71,7 +70,8 @@ See LICENSE.txt file.
 Copyright (C) 2019 Matthieu Gilson, Andrea Insabato, Gorka Zamora-López
 
 """
+
 from . import mou_model
 from .mou_model import *
 
-__version__ = "1.0.dev0"
+__version__ = "1.0"
