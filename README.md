@@ -1,8 +1,6 @@
+<img src="Branding/pymou.png" align="right" width="140" height="100">
+
 # pyMOU
-
-<img src="Branding/pymou.png" style="float:right; width:70px; heigth:50px " alt="myMOU logo" />
-
-<img src="Branding/pymou.png" align="right" width="70" height="50">
 
 *A light package for the estimation of effective connectivity from brain signals considering the multivariate Ornstein-Uhlenbeck process (MOU) as the underlying generative model.*
 
