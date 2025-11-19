@@ -25,11 +25,10 @@ import warnings
 import numpy as np
 import scipy.linalg as spl
 import scipy.stats as stt
-from sklearn.base import BaseEstimator
 
 
 ###############################################################################
-class MOU(BaseEstimator):
+class MOU:
     """
     Description of the class and a summary of its parameters, attributes and
     methods.
