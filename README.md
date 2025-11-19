@@ -1,3 +1,5 @@
+<img src="Branding/pymou.png" style="float:right; width:140px; heigth:50px " alt="myMOU logo" />
+
 # pyMOU
 
 *A light package for the estimation of effective connectivity from brain signals considering the multivariate Ornstein-Uhlenbeck process (MOU) as the underlying generative model.*
@@ -5,8 +7,8 @@
 
 This Python library relies on the MOU process to simulate network activity and to estimate effective connectivity from fMRI brain signals. See references:
 
-* M. Gilson, R. Moreno-Bote, A. Ponce-Alvarez et al. (2016) [Estimation of Directed Effective Connectivity from fMRI Functional Connectivity Hints at Asymmetries of Cortical Connectome](https://doi.org/10.1371/journal.pcbi.1004762). *PLoS Comput. Biol.* **12(3)**: e1004762.
-* M. Gilson, G. Zamora-López, V. Pallarés, et al. (2020) [Model-based whole-brain effective connectivity to study distributed cognition in health and disease](https://doi.org/10.1162/netn_a_00117). *Network Neuroscience* **4(2)**, 338–373.
+* M. Gilson, R. Moreno-Bote, A. Ponce-Alvarez et al. (2016) *[Estimation of Directed Effective Connectivity from fMRI Functional Connectivity Hints at Asymmetries of Cortical Connectome](https://doi.org/10.1371/journal.pcbi.1004762)*. PLoS Comput. Biol. **12(3)**: e1004762.
+* M. Gilson, G. Zamora-López, V. Pallarés, et al. (2020) *[Model-based whole-brain effective connectivity to study distributed cognition in health and disease](https://doi.org/10.1162/netn_a_00117)*. Network Neuroscience **4(2)**, 338–373.
 
 
 ### INSTALLATION
