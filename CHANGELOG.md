@@ -1,6 +1,6 @@
 ### HISTORY OF CHANGES
 
-##### November XX, 2025 (Release of Version 1.0)
+##### November 19, 2025 (Release of Version 1.0)
 
 Stable version 1.0 checked, validated and released.
 
