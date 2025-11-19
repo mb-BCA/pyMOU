@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Copyright (C) 2019-2022 Andrea Insabato, Gorka Zamora-López, Matthieu Gilson
+Copyright (C) 2019 Matthieu Gilson, Andrea Insabato, Gorka Zamora-López
 
 Released under the Apache License, Version 2.0 (the "License");
 you may not use this software except in compliance with the License.
@@ -11,31 +11,40 @@ You may obtain a copy of the License at
 Main class to deal with construction, simulation and estimation for the
 multivariate Ornstein-Uhlenbeck (MOU) process.
 """
+# TODO: Revise all the security checks at the beginning of each function/class.
+# Surely we can improve and simplify these.
+#    - Maybe add an io_helper module like in SiReNetA, or anything more elegant.
+#    - avoid use of isscalar() because complex numbers are also scalar.
+#    - avoid using type(lag) == int
+#    - Check better isinstance(x, numbers.Number), isinstance(x, int),
+#      isinstance(x, np.integer), isinstance(x, float), isinstance(x, np.floating)
 
+# Standard library imports
+import warnings
+# Third-party imports
 import numpy as np
 import scipy.linalg as spl
 import scipy.stats as stt
-from sklearn.base import BaseEstimator
 
 
 ###############################################################################
-class MOU(BaseEstimator):
+class MOU:
     """
     Description of the class and a summary of its parameters, attributes and
     methods.
 
     Parameters
     ----------
-    n : integer
+    n : int
         Number of nodes in the network.
-    J : ndarray of rank-2
+    J : ndarray (2d) of shape (n,n)
         Jacobian matrix between the nodes. The diagonal corresponds to a vector
         of time constants. For off-diagonal elements, the first dimension
         corresponds to target nodes and the second dimension to source nodes
         (J_ij is from i to j).
-    mu : ndarray of rank-1
+    mu : ndarray (1d) of length n
         Mean vector of the inputs to the nodes.
-    Sigma : ndarray of rank-2
+    Sigma : ndarray (2d) of shape (n,n)
         Covariance matrix of the inputs to the nodes (multivariate Wiener
         process).
 
@@ -73,7 +82,7 @@ class MOU(BaseEstimator):
             # 10 nodes by default
             self.n = 10
             # unconnected network
-            C_tmp = np.zeros([self.n, self.n], dtype=float)
+            C_tmp = np.zeros([self.n, self.n], dtype=np.float64)
         elif type(C) == np.ndarray:
             if (not C.ndim == 2) or (not C.shape[0] == C.shape[1]):
                 raise TypeError("""Argument C in MOU constructor must be square
@@ -86,8 +95,8 @@ class MOU(BaseEstimator):
 
         if np.isscalar(tau):
             if tau <= 0:
-                raise RuntimeWarning("""Scalar argument tau in MOU
-                     constructor must be negative for stability.""")
+                raise ValueError( """Scalar argument tau in MOU constructor
+                    must be negative for stability.""" )
             else:
                 tau_tmp = np.ones(self.n) * tau
         elif type(tau) == np.ndarray:
@@ -101,8 +110,9 @@ class MOU(BaseEstimator):
 
         self.J = -np.eye(self.n) / tau_tmp + C_tmp
         if np.any(np.linalg.eigvals(self.J)>0):
-            print("""The constructed MOU process has a Jacobian with negative
-                  eigenvalues, corresponding to unstable dynamics.""")
+            warnings.warn("""The constructed MOU process has a Jacobian with negative
+                  eigenvalues, corresponding to unstable dynamics.""",
+                  category=RuntimeWarning )
 
         # Inputs
         if np.isscalar(mu):
@@ -118,12 +128,12 @@ class MOU(BaseEstimator):
 
         if Sigma is None:
             # uniform unit variance by default
-            self.Sigma = np.eye(self.n, dtype=float)
+            self.Sigma = np.eye(self.n, dtype=np.float64)
         elif np.isscalar(Sigma):
             if not (Sigma>0):
                 raise TypeError("""Scalar argument Sigma in MOU constructor must
                     be non-negative (akin to variance).""")
-            self.Sigma = np.eye(self.n, dtype=float)
+            self.Sigma = np.eye(self.n, dtype=np.float64)
         elif type(Sigma) == np.ndarray:
             if (not Sigma.ndim == 2) or (not Sigma.shape[0] == Sigma.shape[1]) \
                                    or (not Sigma.shape[0] == self.n):
@@ -155,16 +165,15 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        J : ndarray of rank 2
-            The Jacobian matrix. Shape [n x n]
-        Sigma : ndarray of rank 2
-            The input covariance matrix. Shape [n x n]
+        J : ndarray (2d) of shape (n,n)
+            The Jacobian matrix.
+        Sigma : ndarray (2d) of shape (n,n)
+            The input covariance matrix.
 
         Returns
         -------
-        Q0 : ndarray of rank 2
+        Q0 : ndarray (2d) of shape (n,n)
             The theoretical zero-lag covariance matrix.
-            Shape [n, n]
         """
         Q0 = spl.solve_continuous_lyapunov(J.T, -Sigma)
         return Q0
@@ -176,25 +185,25 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        Q0 : ndarray of rank 2
-            The zero-lag covariance matrix. Shape [n x n]
-        J : ndarray of rank 2
-            The Jacobian matrix. Shape [n x n]
+        Q0 : ndarray (2d) of shape(n,n)
+            The zero-lag covariance matrix.
+        J : ndarray (2d) of shape (n,n)
+            The Jacobian matrix.
         lag : float
             The covariance lag
 
         Returns
         -------
-        Qlag : ndarray of rank 2
+        Qlag : ndarray (2d) of shape (n,n)2
             The theoretical covariance matrix with lag.
-            Shape [n, n]
         """
         Qlag = np.dot( Q0, spl.expm( J * lag ) )
         return Qlag
 
 
     def calc_emp_Q(self, X, lag, center=True):
-        """ TODO: move to utils?
+        # TODO: move to utils?
+        """
         Calculate the covariance matrix with zero lag and with lag from
         time series X of shape (time x nodes)
         """
@@ -217,21 +226,21 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        X : ndarray of shape (T,n)
+        X : ndarray (2d) of shape (T,n)
             The timeseries data of the system to estimate, formatted as
             time points x nodes (e.g. ROIs).
-        y : (for compatibility, not used here)
-        lag : integer; default=1
+        y : (for compatibility, not used here), optional.
+        lag : int, optional, default: 1
             Lag in time steps (1st dimension of X).
-        method : string; default='lyapunov'
+        method : string, optional, default: 'lyapunov'
             Set the optimization method; should be 'lyapunov', 'moments' or
             'spectral'.
 
         Returns
         -------
-        J : ndarray of shape (self.n,self.n)
+        J : ndarray (2d) of shape (self.n,self.n)
             The estimated Jacobian (with number of nodes self.n=n from X).
-        Sigma : ndarray of shape (self.n,self.n)
+        Sigma : ndarray (2d) of shape (self.n,self.n)
             Estimated input noise covariance.
         d_fit : dictionary
             A dictionary with diagnostics of the fit. Important keys are:
@@ -270,20 +279,20 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        Q0_obj : ndarray of shape (n,n)
+        Q0_obj : ndarray (2d) of shape (n,n)
             Zero-lag covariance matrix.
-        Q1_obj : ndarray of shape (n,n)
+        Q1_obj : ndarray (2d) of shape (n,n)
             Lagged covariance matrix.
-        lag : integer; default=1
+        lag : int, optional, default=1
             Lag in sampling time steps.
-        method : string (optional)
+        method : string, optional, default: 'lyapunov'
             Set the optimization method; should be 'lyapunov' or 'moments'.
 
         Returns
         -------
-        J : ndarray of shape (self.n,self.n)
+        J : ndarray (2d) of shape (self.n,self.n)
             The estimated Jacobian.
-        Sigma : ndarray of shape (self.n,self.n)
+        Sigma : ndarray (2d) of shape (self.n,self.n)
             Estimated input noise covariance.
         d_fit : dictionary
             A dictionary with diagnostics of the fit (see 'fit' method for
@@ -321,60 +330,62 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        Q0_obj : ndarray of shape (n,n)
+        Q0_obj : ndarray (2d) of shape (n,n)
             The zero-lag covariance matrix as objective to reproduce
-        Q1_obj : ndarray of shape (n,n)
+        Q1_obj : ndarray (2d) of shape (n,n)
             The lagged covariance matrix as objective to reproduce
-        lag : integer
+        lag : int
             Lag in real time corresponding to Q1_obj. Default are set in 'fit'
             and 'fit_th' methods.
-        mask_Q : boolean ndarray of shape (self.n,self.n); default=None
+        tau : scalar, optional, default: None
+            The relaxation time-constant of the MOU process.
+        mask_Q : boolean ndarray (2d) of shape (self.n,self.n), optional, default: None
             Mask for elements of objective covariance matrices Q0_obj and
             Q1_obj to be taken into account in optimization. By default, all
             elements contribute.
-        mask_C : boolean ndarray of shape (self.n,self.n); default=None
+        mask_C : boolean ndarray (2d) of shape (self.n,self.n), optional, default: None
             Mask for tunable elements of connectivity matrix, for example
             estimated by DTI. By default, all connections are allowed (except
             self-connections on diagonal, corresponding to -1/tau)
-        mask_Sigma : boolean ndarray of shape ; default=None
+        mask_Sigma : boolean ndarray (2d) of shape (n,n), optional, default: None
             Mask tunable elements of input covariance matrix Sigma. By default,
             only diagonal elements of Sigma are tuned.
-        regul_C : float; default=0.0
+        regul_C : float, optional, default: 0.0
             Regularization parameter for C. First try values in range
             (0.0-0.5).
-        regul_Sigma : float; default=0.0
+        regul_Sigma : float, optional, default: 0.0
             Regularization parameter for Sigma. Useful when  fitting
-        min_C : float; default=-1e10
+        min_C : float, optional, default: -1e10
             Minimum bound for connectivity estimate C. For instance, useful to
             prevent negative weights (too negative can lead the system to
             dynamic instability), especially for empirical/noisy signals.
-        max_C : float; default=1e10
+        max_C : float, optional, default: 1e10
             Maximum bound for connectivity estimate C. Usually not necessary.
-        min_Sigma_diag : float; default=0.0
+        min_Sigma_diag : float, optional, default: 0.0
             Minimum bound for input variance estimate Sigma (on diagonal).
-        eta_C : float; default=0.05
+        eta_C : float, optional, default: 0.05
             Learning rate for connectivity C.
-        eta_tau : float; default=0.0
+        eta_tau : float, optional, default: 0.0
             Learning rate for tau (inverse on diagonal of Jacobian J).
-        eta_Sigma : float; default=0.05
+        eta_Sigma : float, optional, default: 0.05
             Learning rate for Sigma.
-        max_iter : integer; default=500
+        max_iter : int, optional, default=500
             Maximum for optimization iteration steps. If final number of
             iterations reaches this maximum, it means the algorithm has not
             converged (warning raised).
-        min_iter : integer; default=10
+        min_iter : int, optional, default=10
             Minimum for optimization iteration steps before stopping (in case
             of initial increase of model error).
-        algo_version : string; default='2021'
+        algo_version : string, optional, default: '2021'
             Version of the optimization update; prefer the latest '2021', but
             for comparison the older versions are 'PCB2016' and 'NeNe2020'.
 
         Returns
         -------
-        J : ndarray of shape (self.n,self.n)
+        J : ndarray (2d) of shape (self.n,self.n)
             The estimated Jacobian (with number of nodesw self.n=n from Q0_obj
             and Q1_obj).
-        Sigma : ndarray of of shape (self.n,self.n)
+        Sigma : ndarray (2d) of of shape (self.n,self.n)
             Estimated input noise covariance.
         d_fit : dictionary
             A dictionary with diagnostics of the fit. Important keys are:
@@ -402,16 +413,32 @@ class MOU(BaseEstimator):
         # Autocovariance time constant (exponential decay)
         assert Q0_obj.shape==Q1_obj.shape, """Objective covariance matrices
             should have same shape"""
+        # if tau==None:
+        #     ac = np.hstack((Q0_obj.diagonal(), Q1_obj.diagonal()))
+        #     log_ac = np.log( np.maximum( ac, ac.max() * 1e-6 ) )
+        #     v_lag = np.hstack(([0]*self.n, [lag]*self.n))
+        #     lin_reg = np.polyfit(v_lag, log_ac, 1)
+        #     tau_obj = -1.0 / lin_reg[0]
+        # else:
+        #     #assert type(tau)==float
+        #     assert isinstance(tau, (float, np.floating)),
+        #     tau_obj = tau
+        #     print('tau_obj provided')
+
         if tau==None:
             ac = np.hstack((Q0_obj.diagonal(), Q1_obj.diagonal()))
             log_ac = np.log( np.maximum( ac, ac.max() * 1e-6 ) )
             v_lag = np.hstack(([0]*self.n, [lag]*self.n))
             lin_reg = np.polyfit(v_lag, log_ac, 1)
             tau_obj = -1.0 / lin_reg[0]
-        else:
-            assert type(tau)==float
+        elif isinstance(tau, (int, np.integer)):
+            tau_obj = float(tau)
+            print('tau_obj provided')
+        elif isinstance(tau, (float, np.floating)):
             tau_obj = tau
             print('tau_obj provided')
+        else:
+            raise ValueError( "'tau' must be either None or a scalar number." )
 
         # mask for objective covariances and parameters to tune (C and Sigma)
         mask_diag = np.eye(self.n, dtype=bool)
@@ -434,7 +461,7 @@ class MOU(BaseEstimator):
 
         # Initialize network as unconnected
         # Connectivity C = 0
-        C = np.zeros([self.n, self.n], dtype=float)
+        C = np.zeros([self.n, self.n], dtype=np.float64)
         # vector of time constants
         tau = np.copy(tau_obj)
         # Input covariance such that Sigma = -J.T Q0 - Q0 J (Lyapunov eq) with
@@ -448,12 +475,12 @@ class MOU(BaseEstimator):
 
         # Arrays to record model parameters and outputs
         # model error = matrix distance between FC matrices
-        dist_Q_hist = np.zeros([max_iter], dtype=float)
+        dist_Q_hist = np.zeros([max_iter], dtype=np.float64)
         # Pearson correlation between model and objective FC matrices
-        simil_Q_hist = np.zeros([max_iter], dtype=float)
+        simil_Q_hist = np.zeros([max_iter], dtype=np.float64)
 
         # identity matrix
-        id_mat = np.eye(self.n, dtype=float)
+        id_mat = np.eye(self.n, dtype=np.float64)
 
         # run the optimization process
         stop_opt = False
@@ -519,7 +546,9 @@ class MOU(BaseEstimator):
             # Check if max allowed number of iterations have been reached
             if i_iter >= max_iter-1:
                 stop_opt = True
-                print("Optimization did not converge. Maximum number of iterations arrived.")
+                warnings.warn( """Optimization did not converge. Maximum number
+                    of iterations arrived.""",
+                    category = RuntimeWarning)
             # Check if iteration has finished or still continues
             if stop_opt:
                 self.d_fit['iterations'] = i_iter+1
@@ -546,18 +575,18 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        X : ndarray of rank 2
+        X : ndarray (2d) of shape (n,n)
             The zero-lag covariance matrix of the time series to fit.
-        mask_C : boolean ndarray of rank-2 (optional)
+        mask_C : boolean ndarray (2d) of shape (n,n), optional, default: None
             Mask of known non-zero values for connectivity matrix, for example
             estimated by DTI.
 
         Returns
         -------
-        J : ndarray of rank 2
-            The estimated Jacobian. Shape [n, n]
-        Sigma : ndarray of rank 2
-            Estimated noise covariance. Shape [n, n]
+        J : ndarray (2d) of shape (n,n)
+            The estimated Jacobian.
+        Sigma : ndarray (2d) of shape (n,n)
+            Estimated noise covariance.
         d_fit : dictionary
             A dictionary with diagnostics of the fit. Keys are: ['iterations',
             'distance', 'correlation'].
@@ -576,11 +605,13 @@ class MOU(BaseEstimator):
 
         # cast to real matrices
         if np.any(np.iscomplex(J)):
-            print("Warning: complex values in J; casting to real!")
+            warnings.warn( "Complex values in J; casting to real!",
+                category=RuntimeWarning )
         J_best = np.real(J)
         J_best[np.logical_not(np.logical_or(mask_C,mask_diag))] = 0
         if np.any(np.iscomplex(Sigma)):
-            print("Warning: complex values in Sigma; casting to real!")
+            warnings.warn( "Complex values in Sigma; casting to real!",
+                category=RuntimeWarning )
         Sigma_best = np.real(Sigma)
 
         # model theoretical covariances with real J and Sigma
@@ -615,10 +646,8 @@ class MOU(BaseEstimator):
         try:
             return self.d_fit['correlation']
         except:
-            print('The model should be fitted first.')
+            warnings.warn( "The model should be fitted first.", category=RuntimeWarning )
             return np.nan
-            ## GORKA: Shall this raise a RunTimeWarning or other type of warning?
-
 
     def model_covariance(self, tau=0.0):
         """
@@ -628,7 +657,7 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        tau : scalar
+        tau : float, optional, default: 0.0
             The time lag to calculate the covariance. It can be a positive or
             negative.
 
@@ -648,32 +677,31 @@ class MOU(BaseEstimator):
 
 
     def simulate(self, T=100, dt=0.05, sampling_step=1., random_state=None):
+        # TODO: change the integration step to be more accurate, with np.exp
         """
         Simulate the MOU process with simple Euler integration defined by the
         time step.
 
         Parameters
         ----------
-        T : integer (optional)
-            Duration of simulation.
-        dt : scalar (optional)
+        T : int, optional, default = 100
+            Duration of the simulation.
+        dt : scalar, optional, default: 0.05
             Integration time step.
-        sampling_step : scalar (optional)
+        sampling_step : float, optional, default: 1.0
             Period for subsampling the generated time series.
-        random_state : long or int (optional)
+        random_state : long or int, optional, default: None
             Description here ...
 
         Returns
         --------
-        ts : ndarray of rank-2
-            Time series of simulated network activity of shape [T, n]
+        ts : ndarray (2d) of shape (T,n)
+            Time series of simulated network activity.
 
         Notes
         -----
         It is possible to include an acitvation function to
         give non linear effect of network input; here assumed to be identity
-
-        TODO: change the integration step to be more accurate, with np.exp
         """
         # 0) SECURITY CHECKS
         if dt<0.:
@@ -698,7 +726,7 @@ class MOU(BaseEstimator):
 
         # 1.2) Initialise the arrays
         # Array for generated time-series
-        ts = np.zeros([int(n_T/n_sampl), self.n], dtype=float)
+        ts = np.zeros([int(n_T/n_sampl), self.n], dtype=np.float64)
         # Set initial conditions for activity
         x_tmp = np.random.normal(size=[self.n])
         # Generate noise for all time steps before simulation
@@ -730,21 +758,21 @@ class MOU(BaseEstimator):
 
         Parameters
         ----------
-        T : integer (optional)
+        T : int, optional, default: 100
             Duration of simulation.
-        dt : scalar (optional)
+        dt : float, optional, default: 0.05
             Integration time step.
-        sampling_step : scalar (optional)
+        sampling_step : float, optional, default: 0.1
             Period for subsampling the generated time series.
-        C_profile : scalar or ndarray (optional)
+        C_profile : float or ndarray (1d) of length n, optional, default: 1.0
             Modulation of C over time (same for all connections).
-        random_state : long or int (optional)
+        random_state : long or int, optional, default: None
             Description here ...
 
         Returns
         --------
-        ts : ndarray of rank-2
-            Time series of simulated network activity of shape [T, n]
+        ts : ndarray (2d) of shape (T,n)
+            Time series of simulated network activity.
 
         Notes
         -----
@@ -775,15 +803,15 @@ class MOU(BaseEstimator):
         # XXX TO REFINE
         if not type(C_profile)==np.ndarray: #  C_profile==1.0
             # constant profile
-            C_profile = np.ones([n_T0+n_T], dtype=float)
+            C_profile = np.ones([n_T0+n_T], dtype=np.float64)
         else:
             # Gaussian modulation
-            C_profile_T0 = np.zeros([n_T0+n_T], dtype=float)
+            C_profile_T0 = np.zeros([n_T0+n_T], dtype=np.float64)
             C_profile_T0[n_T0:] = C_profile
 
         # 1.2) Initialise the arrays
         # Array for generated time-series
-        ts = np.zeros([int(n_T/n_sampl), self.n], dtype=float)
+        ts = np.zeros([int(n_T/n_sampl), self.n], dtype=np.float64)
         # Set initial conditions for activity
         x_tmp = np.random.normal(size=[self.n])
         # Generate noise for all time steps before simulation
