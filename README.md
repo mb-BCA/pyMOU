@@ -1,4 +1,4 @@
-<img src="Branding/pymou.png" align="center" width="105" height="75">
+<img src="Branding/pymou.png" align="right" width="105" height="75">
 
 # pyMOU
 
