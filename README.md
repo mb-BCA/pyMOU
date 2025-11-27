@@ -15,7 +15,7 @@ This Python library relies on the MOU process to simulate network activity and t
 
 #### Installing from (test) PyPI 
 
-For development purposes, pyMOU is registered in [TestPyPI](https://test.pypi.org), a separate testbench from the official *Python Package Index*, [PyPI](https://pypi.org/project/galib/) . In TestPyPI, none of the dependencies exist (python>=3.6, numpy>=1.6, scipy and scikit-learn). Therefore, before installing pyMOU please install these packages in the target python environment. Then, open a terminal window and type:
+For development purposes, pyMOU is registered in [TestPyPI](https://test.pypi.org), a separate testbench from the official *Python Package Index*, [PyPI](https://pypi.org/project/pyMOU/) . In TestPyPI, none of the dependencies exist (python>=3.6, numpy>=1.6, scipy and scikit-learn). Therefore, before installing pyMOU please install these packages in the target python environment. Then, open a terminal window and type:
 
     python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps pyMOU
 
@@ -23,7 +23,7 @@ The, `--no-deps` argument will skip the attempt to install the dependencies from
 
 #### Direct installation from GitHub 
 
-If you have [git](https://git-scm.com) installed, you can install pyGAlib directly from its GitHub repository. Open a terminal window and type:
+If you have [git](https://git-scm.com) installed, you can install pyMOU directly from its GitHub repository. Open a terminal window and type:
 
 	python3 -m pip install git+https://github.com/mb-BCA/pyMOU.git@master
 
