@@ -77,6 +77,7 @@ class MOU:
         """
 
         # SECURITY CHECKS AND ARRANGEMENTS FOR THE PARAMETERS
+        # TODO: These checks could be done more elegantly.
         # Construct Jacobian
         if C is None:
             # 10 nodes by default
@@ -175,7 +176,8 @@ class MOU:
         Q0 : ndarray (2d) of shape (n,n)
             The theoretical zero-lag covariance matrix.
         """
-        Q0 = spl.solve_continuous_lyapunov(J.T, -Sigma)
+        # Q0 = spl.solve_continuous_lyapunov(J.T, -Sigma)  # Why not -Sigma.T?
+        Q0 = spl.solve_continuous_lyapunov(J, -Sigma)
         return Q0
 
 
@@ -197,12 +199,12 @@ class MOU:
         Qlag : ndarray (2d) of shape (n,n)2
             The theoretical covariance matrix with lag.
         """
-        Qlag = np.dot( Q0, spl.expm( J * lag ) )
+        # Qlag = np.dot( Q0, spl.expm(J*lag) )
+        Qlag = np.dot( spl.expm(J*lag), Q0 )
         return Qlag
 
 
     def calc_emp_Q(self, X, lag, center=True):
-        # TODO: move to utils?
         """
         Calculate the covariance matrix with zero lag and with lag from
         time series X of shape (time x nodes)
@@ -212,14 +214,17 @@ class MOU:
         if center:
             X = X - np.outer(np.ones(T), X.mean(axis=0))
         # calculate the two covariance matrices with same number of points
+        # Q0 = np.tensordot(X[0:T-lag,:], X[0:T-lag,:], axes=(0,0))
+        # Qlag = np.tensordot(X[0:T-lag,:], X[lag:T,:], axes=(0,0))
         Q0 = np.tensordot(X[0:T-lag,:], X[0:T-lag,:], axes=(0,0))
-        Qlag = np.tensordot(X[0:T-lag,:], X[lag:T,:], axes=(0,0))
+        Qlag = np.tensordot(X[lag:T,:], X[0:T-lag,:], axes=(0,0))
         # rescale by number of time points -1 (not necessary)
         Q0 /= T - lag - 1
         Qlag /= T - lag - 1
         return Q0, Qlag
 
 
+    # CONTINUE HERE !!
     def fit(self, X, y=None, lag=1, method='lyapunov', center=True, **kwargs):
         """
         Wrapper for model fiting from time series to call the specific method.
