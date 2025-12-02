@@ -69,15 +69,12 @@ class MOU:
         Sigma.
     """
 
-    def __init__(self, C=None, tau=1.0, mu=0.0, Sigma=None,
-                random_state=None):
+    def __init__(self, C=None, tau=1.0, mu=0.0, Sigma=None, random_state=None):
         """Initialize self. See help(MOU) for further information.
         The reason for separating the diagonal and off-diagonal elements in
         the Jacobian comes from focusing on the connectivity matrix as a graph.
         """
-
         # SECURITY CHECKS AND ARRANGEMENTS FOR THE PARAMETERS
-        # TODO: These checks could be done more elegantly.
         # Construct Jacobian
         if C is None:
             # 10 nodes by default
@@ -176,7 +173,7 @@ class MOU:
         Q0 : ndarray (2d) of shape (n,n)
             The theoretical zero-lag covariance matrix.
         """
-        # Q0 = spl.solve_continuous_lyapunov(J.T, -Sigma)  # Why not -Sigma.T?
+        # Q0 = spl.solve_continuous_lyapunov(J.T, -Sigma)
         Q0 = spl.solve_continuous_lyapunov(J, -Sigma)
         return Q0
 
@@ -214,17 +211,14 @@ class MOU:
         if center:
             X = X - np.outer(np.ones(T), X.mean(axis=0))
         # calculate the two covariance matrices with same number of points
-        # Q0 = np.tensordot(X[0:T-lag,:], X[0:T-lag,:], axes=(0,0))
-        # Qlag = np.tensordot(X[0:T-lag,:], X[lag:T,:], axes=(0,0))
         Q0 = np.tensordot(X[0:T-lag,:], X[0:T-lag,:], axes=(0,0))
-        Qlag = np.tensordot(X[lag:T,:], X[0:T-lag,:], axes=(0,0))
+        Qlag = np.tensordot(X[0:T-lag,:], X[lag:T,:], axes=(0,0))
         # rescale by number of time points -1 (not necessary)
         Q0 /= T - lag - 1
         Qlag /= T - lag - 1
         return Q0, Qlag
 
 
-    # CONTINUE HERE !!
     def fit(self, X, y=None, lag=1, method='lyapunov', center=True, **kwargs):
         """
         Wrapper for model fiting from time series to call the specific method.
@@ -253,7 +247,6 @@ class MOU:
             fit as measured by Pearson correlation on vectorized matrices).
         """
 
-        # TODO: automatize array checks and dimensionality
         if (not type(X) == np.ndarray) or (not X.ndim == 2):
             raise TypeError("""Argument X must be matrix (time x nodes).""")
         self.n = X.shape[1]
@@ -705,7 +698,7 @@ class MOU:
 
         Notes
         -----
-        It is possible to include an acitvation function to
+        It is possible to include an activation function to
         give non linear effect of network input; here assumed to be identity
         """
         # 0) SECURITY CHECKS
@@ -745,7 +738,8 @@ class MOU:
         sqrt_Sigma = spl.sqrtm(self.Sigma)
         for t in np.arange(n_T0+n_T):
             # update of activity
-            x_tmp += np.dot(x_tmp, J_dt) + mu_dt + np.dot(sqrt_Sigma, noise[t])
+            # x_tmp += np.dot(x_tmp, J_dt) + mu_dt + np.dot(sqrt_Sigma, noise[t])
+            x_tmp += np.dot(J_dt, x_tmp) + mu_dt + np.dot(sqrt_Sigma, noise[t])
             # Discard first n_T0 timepoints
             if t >= n_T0:
                 # Subsample timeseries (e.g. to match fMRI time resolution)
@@ -834,7 +828,10 @@ class MOU:
         sqrt_Sigma = spl.sqrtm(self.Sigma)
         for t in np.arange(n_T0+n_T):
             # update of activity
-            x_tmp += np.dot(x_tmp, diag_J_dt + C_dt * C_profile_T0[t]) + mu_dt + np.dot(sqrt_Sigma, noise[t])
+            # x_tmp += np.dot(x_tmp, diag_J_dt + C_dt * C_profile_T0[t]) + mu_dt +
+            #                 np.dot(sqrt_Sigma, noise[t])
+            x_tmp += np.dot(diag_J_dt + C_dt * C_profile_T0[t], x_tmp) + mu_dt +
+                            np.dot(sqrt_Sigma, noise[t])
             # Discard first n_T0 timepoints
             if t >= n_T0:
                 # Subsample timeseries (e.g. to match fMRI time resolution)
